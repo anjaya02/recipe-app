@@ -14,12 +14,33 @@ import { notFound, errorHandler } from "./middleware/errors.js";
 await connectDB();
 
 const app = express();
-app.use(helmet());
+
+app.set("trust proxy", 1);
+
+app.use(
+  cors({
+    origin: config.clientOrigin, 
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
+app.options("*", cors());
+
+app.use(helmet({ crossOriginResourcePolicy: false }));
 app.use(morgan("dev"));
 app.use(express.json());
 app.use(cookieParser());
-app.use(cors({ origin: config.clientOrigin, credentials: true }));
-app.use(rateLimit({ windowMs: 60_000, max: 100 }));
+
+app.use(
+  rateLimit({
+    windowMs: 60_000,
+    max: 100,
+    standardHeaders: true,
+    legacyHeaders: false,
+    skip: (req) => req.method === "OPTIONS",
+  })
+);
 
 app.get("/api/health", (_, res) => res.json({ ok: true }));
 
