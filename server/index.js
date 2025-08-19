@@ -1,0 +1,33 @@
+import express from "express";
+import cookieParser from "cookie-parser";
+import cors from "cors";
+import helmet from "helmet";
+import morgan from "morgan";
+import rateLimit from "express-rate-limit";
+import { connectDB } from "./db.js";
+import { config } from "./config.js";
+import authRoutes from "./routes/auth.routes.js";
+import recipeRoutes from "./routes/recipe.routes.js";
+import favoriteRoutes from "./routes/favorite.routes.js";
+import { notFound, errorHandler } from "./middleware/errors.js";
+
+await connectDB();
+
+const app = express();
+app.use(helmet());
+app.use(morgan("dev"));
+app.use(express.json());
+app.use(cookieParser());
+app.use(cors({ origin: config.clientOrigin, credentials: true }));
+app.use(rateLimit({ windowMs: 60_000, max: 100 }));
+
+app.get("/api/health", (_, res) => res.json({ ok: true }));
+
+app.use("/api/auth", authRoutes);
+app.use("/api/recipes", recipeRoutes);
+app.use("/api/favorites", favoriteRoutes);
+
+app.use(notFound);
+app.use(errorHandler);
+
+app.listen(config.port, () => console.log(`API on :${config.port}`));
