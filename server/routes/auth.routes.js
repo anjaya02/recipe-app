@@ -28,8 +28,9 @@ router.post("/register", validate(authSchema), async (req, res, next) => {
     const token = sign(user);
     res.cookie("token", token, {
       httpOnly: true,
-      sameSite: "lax", 
-      secure: config.cookieSecure,
+      sameSite: "none", 
+      secure: true, 
+      path: "/", 
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
     res.status(201).json({ id: user._id, email: user.email, token });
@@ -51,8 +52,9 @@ router.post("/login", validate(authSchema), async (req, res, next) => {
     const token = sign(user);
     res.cookie("token", token, {
       httpOnly: true,
-      sameSite: "lax",
-      secure: config.cookieSecure,
+      sameSite: "none", 
+      secure: true, 
+      path: "/",
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
     res.json({ id: user._id, email: user.email, token });
