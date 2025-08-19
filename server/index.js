@@ -45,8 +45,8 @@ app.use(
 app.get("/api/health", (_, res) => res.json({ ok: true }));
 
 app.use("/api/auth", authRoutes);
-app.use("/api/recipes", recipeRoutes);
-app.use("/api/favorites", favoriteRoutes);
+// app.use("/api/recipes", recipeRoutes);
+// app.use("/api/favorites", favoriteRoutes);
 
 app.use(notFound);
 app.use(errorHandler);
